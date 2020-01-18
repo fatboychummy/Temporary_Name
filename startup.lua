@@ -5,8 +5,6 @@ else
   print("Turtle doot doot time.")
 end
 
-local itemCache = {}
-
 -- rotate until we see a modem block
 local function findModem()
   for i = 1, 4 do
@@ -218,11 +216,6 @@ local function grabItems()
   end
 end
 
--- put our items in the cache so we can select them easier
-local function cacheItems()
-  for i = 1, 16 do
-    itemCache[i] = turtle.getItemDetail(i)
-  end
 end
 
 os.setComputerLabel(nil)
@@ -244,7 +237,5 @@ else
   -- get is a number which is not 0 or 16 (a wrong number of items)
   error("Please empty turtle manually.")
 end
-
-cacheItems()
 
 print("Ready.")
