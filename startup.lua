@@ -204,7 +204,6 @@ local function grabItems()
   local localName = peripheral.call("back", "getNameLocal")
   local chest
 
-
   -- find the first chest or shulker box.
   for _, name in ipairs(peripheral.getNames()) do
     if name:find("chest") or name:find("shulker") then
