@@ -216,6 +216,109 @@ local function grabItems()
   end
 end
 
+-- "sorts" all items by damage value
+local function sort()
+  local emptySlot = 1 -- the hotswap slot basically
+
+  -- swap two items using the hotswap slot
+  local function swap(x, y)
+    -- just instant return if we are trying to swap to same pos
+    if x == y then return end
+    -- move the items
+    local function move(xx, yy)
+      turtle.select(xx)
+      turtle.transferTo(yy)
+    end
+
+    if x == emptySlot then
+      move(y, x)
+      emptySlot = y
+      return
+    end
+    if y == emptySlot then
+      move(x, y)
+      emptySlot = x
+      return
+    end
+
+    move(x, emptySlot)
+    move(y, x)
+    move(emptySlot, y)
+  end
+
+  -- find an item with damage value x
+  local function find(x)
+    for i = 1, 16 do
+      local det = turtle.getItemDetail(i)
+      if det and det.damage == x then
+        return i
+      end
+    end
+    error("Could not find color with damage value " .. tostring(x) .. ".", 2)
+  end
+
+  -- if a block is placed already, make sure we grab it back.
+  turtle.dig()
+
+  -- find black concrete or wool (damage = 15)
+  -- assuming all inventory slots are used.
+  local fd = find(15)
+  turtle.select(fd)
+  turtle.place()
+  emptySlot = fd
+
+  for i = 1, 15 do
+    local et = find(i - 1)
+    swap(i, et)
+  end
+end
+
+-- find a color by damage value
+local function place(x)
+  x = x <= 15 and x >= 0 and x or error("Expected value between 0 and 15", 2)
+
+  turtle.dig()
+  turtle.select(x + 1)
+  turtle.place()
+end
+
+local function run()
+  -- block colors
+  local bcolors = {
+    white = 0,
+    orange = 1,
+    magenta = 2,
+    lightBlue = 3,
+    yellow = 4,
+    lime = 5,
+    pink = 6,
+    gray = 7,
+    lightGray = 8,
+    cyan = 9,
+    purple = 10,
+    blue = 11,
+    brown = 12,
+    green = 13,
+    red = 14,
+    black = 15
+  }
+
+  local placed = 15
+
+  print("Sorting.")
+  sort()
+  turtle.dig()
+  place(bcolors.black)
+
+  peripheral.call("back", "open", 1)
+  -- listen for colors
+  while true do
+    local _, _, _, _, msg = os.pullEvent("modem_message")
+    if msg ~= placed then
+      place(msg)
+      placed = msg
+    end
+  end
 end
 
 os.setComputerLabel(nil)
@@ -231,11 +334,12 @@ end
 if get == 0 then
   print("Grabbing items")
   grabItems()
-elseif get == 16 then
+elseif get == 16 or get == 15 then
   print("Items already grabbed. Doing nothing.")
 else
-  -- get is a number which is not 0 or 16 (a wrong number of items)
+  -- get is a number which is not 0 or 16 or 15 (a wrong number of items)
   error("Please empty turtle manually.")
 end
 
 print("Ready.")
+run()
