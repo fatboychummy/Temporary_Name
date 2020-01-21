@@ -17,6 +17,19 @@ local bcolors = {
   black = 15
 }
 
+for i = 0, 5 do
+  for o = 0, 8 do
+    peripheral.call("bottom", "transmit", 1, 1, {
+      x = i,
+      y = o,
+      xchar = 0,
+      ychar = 0,
+      color = i
+    })
+  end
+end
+
+--[[
 while true do
   io.write("> ")
   local inp = io.read()
@@ -24,3 +37,4 @@ while true do
   peripheral.call("bottom", "transmit", 1, 1, bcolors[inp] or 15)
   print(bcolors[inp] or 15)
 end
+]]

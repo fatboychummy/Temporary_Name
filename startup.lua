@@ -310,13 +310,20 @@ local function run()
   turtle.dig()
   place(bcolors.black)
 
+  -- open modem for listening
   peripheral.call("back", "open", 1)
+
   -- listen for colors
   while true do
     local _, _, _, _, msg = os.pullEvent("modem_message")
-    if msg ~= placed then
-      place(msg)
-      placed = msg
+
+    if type(msg) == "table" then
+      if msg.x == x and msg.y == y and msg.xchar == xchar and msg.ychar == ychar then
+        if msg.color and msg.color ~= placed then
+          place(msg.color)
+          placed = msg.color
+        end
+      end
     end
   end
 end
